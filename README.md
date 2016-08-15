@@ -1,30 +1,26 @@
 # while-static-analyzer
 An implementation of a simple static analyzer for While-like language. The syntax of the language is shown below.
 
-S   : 	Stmt 			- Statements
-a   : 	AExp			- Arithmetic expressions
-x,y : 	Var			- Program variables
-n   :		Num			- Number literals
-b   :	 	BExp			- Boolean expressions
+type aexpr =
+    Const of int
+  | Unknown
+  | Var of var
+  | Binop of binop * expr * expr
 
+type comp = Eq | Neq | Le | Lt
 
-a :=  x
-    | n
-	 | a1 op_a2
+type bexpr =
+  	 Comp of comp * aexpr * aexpr
+  | And of bexpr * bexpr
+  | Or of bexpr * bexpr
+  | Not bexpr
 
-b := 	true
-	 | false
-	 | not b
-	 | b1 op_b b2
-	 | a1 op_r a2	
-	 
-S := 	x = a; 
-	 | x = b; 
-	 | skip; 
-	 | S1; S2; 
-	 | if b { S1 } else { S2 }
-	 | while b { S }
+type stmt =
+    Assign of label * var * expr
+  | Skip of label
+  | If of label * bexpr * stmt * stmt
+  | While of label * bexpr * stmt
+  | Seq of stmt * stmt
 
-op_a := +, - , *, /, ...
-op_r := >=, >, <=, <, ...
-op_b := and, or, xor, ...
+type program = stmt * label
+
