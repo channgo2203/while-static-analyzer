@@ -31,7 +31,7 @@ let args = [
   ("-parse", Arg.Unit (fun () -> mode := Parse) , "Print the program with labels");
   ("-cfg", Arg.Unit (fun () -> mode := Cfg) , "Print the control flow graph");
   ("-sign", Arg.Unit (fun () -> mode := Sign) , "Sign analysis");
-  ("-interval", Arg.Unit (fun () -> mode := Sign) , "Interval analysis");
+  ("-interval", Arg.Unit (fun () -> mode := Interval) , "Interval analysis");
   ("-reduce", Arg.Unit (fun () -> EnvAbstractionNotRelational.reduction := true) , "Reduction operator for non-relational environment abstractions");
 ]
 

@@ -47,6 +47,3 @@ sig
         
   val backward_test : Syntax.test -> L.t -> L.t
 end
-
-
-
