@@ -54,7 +54,7 @@ let print_comp eq = function
 type prioptest = PAnd | PNo
 
 let rec print_test_aux print_comp tab filter sor sand eq priop scal_optim = function
-    (*    | Not t -> "not "^(print_test tab t) *)
+  | Not t -> "not test" 
   | Comp (c,e1,e2) -> filter (sprintf "%s %s %s" (print_expr tab No true scal_optim e1) (print_comp eq c) (print_expr tab No true scal_optim e2))
   | And (t1,t2) -> 
       let s = sprintf "%s %s %s" (print_test_aux print_comp tab filter sor sand eq PAnd scal_optim t1) sand (print_test_aux print_comp tab filter sor sand eq PAnd scal_optim t2) in

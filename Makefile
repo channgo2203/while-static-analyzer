@@ -46,10 +46,10 @@ doc: all
 	@$(OCAMLOPT) -c $<
 
 distrib: clean
-	cd ..;	mkdir while-static-analyzer; cp -r caml/* while-static-analyzer/;	tar -czf caml/while-static-analyzer.tgz while-static-analyzer; rm -fr ../while-static-analyzer
+	cd ..;	mkdir while_analyser; cp -r caml/* while_analyser/;	tar -czf caml/while_analyser.tgz while_analyser; rm -fr ../while_analyser
 
 clean::
-	rm -f *.cm[iox] *.o *~ *.annot while_lexer.ml while_parser.ml while_parser.mli analyse doc/*.html example/*~ while-static-analyzer.tgz
+	rm -f *.cm[iox] *.o *~ *.annot while_lexer.ml while_parser.ml while_parser.mli analyse doc/*.html example/*~ while_analyser.tgz
 
 depend:
 	ocamldep $(LIBPATH) $(SRCML) analyse.mli while_parser.mli $(SRCMLI) > .depend

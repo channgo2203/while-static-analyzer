@@ -1,7 +1,8 @@
 (*
- *  This file is part of a simple static analyzer for the While language
- *  Copyright (c) Van Chan Ngo
- *  
+ *  This file is part of WhileAnalyser
+ *  Copyright (c)2005-2008 INRIA Rennes - Bretagne Atlantique
+ *  David Pichardie <first.last@irisa.fr>
+ *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation; either version 2 of the License, or
@@ -17,25 +18,21 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *)
 
+module Sign = Analyse.Make(EnvAbstractionNotRelational.Make(NumAbstractionSign.Make))
 
-type mode = Parse 
-	| Cfg 
-	| Sign 
-	| Interval
-	| Liveness
-	
+module Interval = Analyse.Make(EnvAbstractionNotRelational.Make(NumAbstractionInterval.Make))
+
+type mode = Parse | Cfg | Sign | Interval
 
 let mode = ref Interval
-(** path of the source code file *)
 let target = ref ""
 
 let args = [ 
   ("-parse", Arg.Unit (fun () -> mode := Parse) , "Print the program with labels");
   ("-cfg", Arg.Unit (fun () -> mode := Cfg) , "Print the control flow graph");
   ("-sign", Arg.Unit (fun () -> mode := Sign) , "Sign analysis");
-  ("-interval", Arg.Unit (fun () -> mode := Interval) , "Interval analysis");
-  ("-liveness", Arg.Unit (fun () -> mode := Liveness) , "Liveness analysis");
-  (*("-reduce", Arg.Unit (fun () -> EnvAbstractionNotRelational.reduction := true) , "Reduction operator for non-relational environment abstractions");*)
+  ("-interval", Arg.Unit (fun () -> mode := Sign) , "Interval analysis");
+  ("-reduce", Arg.Unit (fun () -> EnvAbstractionNotRelational.reduction := true) , "Reduction operator for non-relational environment abstractions");
 ]
 
 let _ =
@@ -43,14 +40,17 @@ let _ =
     begin
       Arg.parse args (fun s -> target := s) "usage: analyse <prog>" ;
       try 
-			match !mode with
-	  	 	| Parse -> print_string (Print.print_program (Parse.parse !target))
-	  	 	| Cfg -> Cfg.print_cfg (Parse.parse !target)
-	  	 	| Sign ->
-	      	let p = Parse.parse !target in
-	      	let res = Sign.solve_and_print p in
-				print_string (Print.print_program_with_res p res)
-	  	 	| _ -> print_string "To be implemented.\n"
+	match !mode with
+	  | Parse -> print_string (Print.print_program (Parse.parse !target))
+	  | Cfg -> Cfg.print_cfg (Parse.parse !target)
+	  | Sign ->
+	      let p = Parse.parse !target in
+	      let res = Sign.solve_and_print p in
+		print_string (Print.print_program_with_res p res)
+	  | Interval ->
+	      let p = Parse.parse !target in
+	      let res = Interval.solve_and_print p in
+		print_string (Print.print_program_with_res p res)
       with x -> Printf.printf "uncaught exception %s\n" (Printexc.to_string x) 
     end
 

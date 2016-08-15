@@ -65,6 +65,7 @@ test:
  | expr comp expr { Syntax.Comp ($2,$1,$3) }
  | test AND test  { Syntax.And ($1,$3) }
  | test OR test   { Syntax.Or ($1,$3) }
+ | NOT test			{ Syntax.Not ($2) }
 ;
 
 comp:

@@ -1,53 +1,55 @@
-
 type label = int
 type var = string
 
 type binop =
   | Add | Sub | Mult
 
-type aexpr =
+type expr =
   | Const of int
   | Unknown
   | Var of var
-  | Binop of binop * aexpr * aexpr
+  | Binop of binop * expr * expr
 
 type comp = Eq | Neq | Le | Lt
 
-type bexpr =
-  | Comp of comp * aexpr * aexpr
-  | And of bexpr * bexpr
-  | Or of bexpr * bexpr
-  | Not of bexpr
+type test =
+  | Comp of comp * expr * expr
+  | And of test * test
+  | Or of test * test
+  | Not of test
 
 type stmt =
-  | Assign of label * var * aexpr
+  | Assign of label * var * expr
   | Skip of label
-  | If of label * bepxr * stmt * stmt
-  | While of label * bexpr * stmt
+  | If of label * test * stmt * stmt
+  | While of label * test *stmt
   | Seq of stmt * stmt
 
 type program = stmt * label
 
+(*********************************************************)
+(* Computes of the set of variables present in a program *)
+(*********************************************************)
 
 module S = Set.Make (struct type t = var let compare = compare end)
 
-let rec var_aexpr s = function
+let rec var_expr s = function
   | Const z -> s
   | Unknown -> s
   | Var x -> S.add x s
-  | Binop (o,e1,e2) -> var_aexpr (var_aexpr s e1) e2
+  | Binop (o,e1,e2) -> var_expr (var_expr s e1) e2
 
-let rec var_bexpr s = function
-  | Comp (c,e1,e2) -> var_aexpr (var_aexpr s e1) e2
-  | And (b1,b2) -> var_bexpr (var_bexpr s b1) b2
-  | Or (b1,b2) -> var_bexpr (var_bexpr s b1) b2
-  | Not b -> var_bexpr s b
+let rec var_test s = function
+  | Comp (c,e1,e2) -> var_expr (var_expr s e1) e2
+  | And (t1,t2) -> var_test (var_test s t1) t2
+  | Or (t1,t2) -> var_test (var_test s t1) t2
+  | Not t -> var_test s t
 
 let rec var_stmt s = function
   | Skip l -> s
-  | Assign (l,x,e) -> S.add x (var_aexpr s e)
-  | If (l,b,stm1,stm2) -> var_bexpr (var_stmt (var_stmt s stm1) stm2) b
-  | While (l,b,stms) -> var_bexpr (var_stmt s stms) b
-  | Seq (stm1,stm2) -> var_stmt (var_stmt s stm1) stm2
+  | Assign (l,x,e) -> S.add x (var_expr s e)
+  | If (l,t,b1,b2) -> var_test (var_stmt (var_stmt s b1) b2) t
+  | While (l,t,b) -> var_test (var_stmt s b) t
+  | Seq (i1,i2) -> var_stmt (var_stmt s i1) i2
 
 let vars (p,l) = S.elements (var_stmt S.empty p)

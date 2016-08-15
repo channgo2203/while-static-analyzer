@@ -1,14 +1,12 @@
 {
-  open Lexing  (* il n'est ainsi pas necessaire de prefixer par "Lexing." 
-                  la fonction lexeme *) 
-  open While_parser  (* pour connaitre le type token *)
-
+  open Lexing 
+  open While_parser
+  
   exception Stop
 
-  (*      table des mots clés     *)
   let kwd_tab = Hashtbl.create 23 
 
-  let _ = (* initialisation de la table de hash *)
+  let _ = 
     Hashtbl.add kwd_tab "while" WHILE;
     Hashtbl.add kwd_tab "for" FOR;
     Hashtbl.add kwd_tab "skip" SKIP;
@@ -20,11 +18,10 @@
     Hashtbl.add kwd_tab "and" AND;
     Hashtbl.add kwd_tab "or" OR
 
-  let id_or_kwd s = (* cherche le token associé à s ou renvoie IDENT s *)  
+  let id_or_kwd s = 
     try Hashtbl.find kwd_tab s 
     with Not_found -> IDENT(s) 
 
-  (* pour gérer les commentaires imbriqués *)
   let level = ref 0
 
   let currentline = ref 1
@@ -42,14 +39,13 @@ rule nexttoken = parse
     space+  { nexttoken lexbuf }
   | '\n'    { incr currentline; nexttoken lexbuf }
   | "(*"    { level := 1; comment lexbuf }
-		| '#'[^'\n']*['\n'] {nexttoken  lexbuf}
-(*  | "fin"   { raise Stop }*)
+  | '#'[^'\n']*['\n'] {nexttoken  lexbuf}
   | ident   { id_or_kwd (lexeme lexbuf) }
   | '{'     { LB }
   | '}'     { RB }
   | '('     { LP }
   | ')'     { RP }
-  | "=="     { EQ }
+  | "=="    { EQ }
   | "<>"    { NEQ }
   | "<="    { LE }
   | '<'     { LT }
